@@ -62,23 +62,7 @@ class FieldHandler():
     def create_field_for_checkbox(self, field, options):
         return forms.BooleanField(widget=forms.CheckboxInput, **options)
 
-def AngularFormDecorator(form_class):
-    orig_init = form_class.__init__
-    # make copy of original __init__, so we can call it without recursion
 
-    def __init__(self, *args, **kwargs):
-        orig_init(self, *args, **kwargs) # call the original __init__
-        prefix = kwargs.pop('prefix', None)
-        for field in self.fields.keys():
-            if prefix:
-                kwargs = {'ng-model': '%s.%s'%(prefix,field)}
-            else:
-                kwargs = {'ng-model': '%s'%(field)}
-            kwargs['initial-value']=''
-            self.fields[field].widget.attrs.update(kwargs)
-
-    form_class.__init__ = __init__ # set the class' __init__ to the new one
-    return form_class
 
 
 
@@ -94,18 +78,43 @@ class ExtensibleModelForm(forms.ModelForm):
                         args[0]['data.'+key]=value    
         super(ExtensibleModelForm,self).__init__(*args, **kwargs)
         
+        #Restrict type to the same content type as the model
         content_type = self.__class__._meta.model.__name__.lower()
         instance = kwargs.get('instance', None)
         if self.fields.has_key('type'):
-            self.fields['type'].queryset = ModelType.objects.filter(content_type=content_type)
+            self.fields['type'].queryset = ModelType.objects.filter(content_type__model=content_type)
         
-        if instance:
-            if instance.type:
-                if instance.type.fields:
-                    fh = FieldHandler(instance.type.fields,instance.data)
-                    for key, field in fh.formfields.iteritems():
-                        field_name = 'data.%s'%key
-                        self.fields[field_name] = field#get_field(field,initial)
+        
+        #Find out type so we can add extra fields
+        type = False
+        data = {}
+        if len(args) > 0:
+            type_id = args[0].get('type',False)
+            data = self.initial
+            if type_id != False: #Type was submitted
+                try: #try using submitted type
+                    type = ModelType.objects.get(id=type_id)
+                except: #if fails or was blank, set to none
+                    type = None
+        if type == False and instance: #Type was not submitted, use instance type if provided
+            type = instance.type
+            data = instance.data
+
+        #Based on the type, add extra fields and set values            
+        if type:
+            if type.fields:
+                fh = FieldHandler(type.fields,data)
+                for key, field in fh.formfields.iteritems():
+                    field_name = 'data.%s'%key
+                    self.fields[field_name] = field#get_field(field,initial)
+        
+#         if instance:
+#             if instance.type:
+#                 if instance.type.fields:
+#                     fh = FieldHandler(instance.type.fields,instance.data)
+#                     for key, field in fh.formfields.iteritems():
+#                         field_name = 'data.%s'%key
+#                         self.fields[field_name] = field#get_field(field,initial)
                 
         if field_template:
             self.helper = FormHelper(self)
@@ -124,5 +133,11 @@ class ExtensibleModelForm(forms.ModelForm):
 class ModelTypeForm(forms.ModelForm):
     class Meta:
         model = ModelType
-        fields = ('name','description','fields')
+        fields = ('content_type','name','description','fields')
+
+class CreateModelTypeForm(forms.ModelForm):
+    class Meta:
+        model = ModelType
+        fields = ('content_type','name','description')
+                
     

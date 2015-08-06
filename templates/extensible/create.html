@@ -1,0 +1,24 @@
+{% extends "glims/dashboard.html" %}
+{% load crispy_forms_tags %}
+{% block page %}Create ModelType{% endblock %}
+{% block breadcrumbs %}<a href="{% url 'model_types' %}">Model Types</a> / Create {% endblock %}
+{% block content %}
+</script>
+<div class="row">
+	<div class="col-lg-12">
+	      <div class="col-lg-12">
+        <div class="widget">
+          <div class="widget-header">
+            Create ModelType
+          </div>
+		<div class="widget-body" >
+			<form action="" method="POST">
+				{% csrf_token %}
+				{{form|crispy}}
+				<button>Submit</button>
+			</form>
+		</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
