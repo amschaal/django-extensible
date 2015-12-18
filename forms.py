@@ -36,7 +36,7 @@ class FieldHandler():
         return options
 
     def create_field_for_text(self, field, options):
-        options['max_length'] = int(field.get("max_length", "20") )
+        options['max_length'] = int(field.get("max_length", "100") )
         return forms.CharField(**options)
     
     def create_field_for_file(self, field, options):
@@ -50,6 +50,11 @@ class FieldHandler():
         options['max_value'] = int(field.get("max_value", "999999999") )
         options['min_value'] = int(field.get("min_value", "-999999999") )
         return forms.IntegerField(**options)
+    
+    def create_field_for_float(self, field, options):
+#         options['max_value'] = int(field.get("max_value", "999999999") )
+#         options['min_value'] = int(field.get("min_value", "-999999999") )
+        return forms.FloatField(**options)
 
     def create_field_for_radio(self, field, options):
         options['choices'] = [ (c['value'], c['name'] ) for c in field['choices'] ]
@@ -83,25 +88,28 @@ class ExtensibleModelForm(forms.ModelForm):
         instance = kwargs.get('instance', None)
         if self.fields.has_key('type'):
             self.fields['type'].queryset = ModelType.objects.filter(content_type__model=content_type)
-        
-        
+
         #Find out type so we can add extra fields
         type = False
         data = {}
+        type_id = self.initial.get('type',False)
         if len(args) > 0:
             type_id = args[0].get('type',False)
+            if not type_id:
+                type_id = self.initial.get('type',False)
             data = self.initial
-            if type_id != False: #Type was submitted
-                try: #try using submitted type
-                    type = ModelType.objects.get(id=type_id)
-                except: #if fails or was blank, set to none
-                    type = None
+        if type_id != False: #Type was submitted
+            try: #try using submitted type
+                type = ModelType.objects.get(id=type_id)
+            except: #if fails or was blank, set to none
+                type = None
         if type == False and instance: #Type was not submitted, use instance type if provided
             type = instance.type
             data = instance.data
 
         #Based on the type, add extra fields and set values            
         if type:
+            
             if type.fields:
                 fh = FieldHandler(type.fields,data)
                 for key, field in fh.formfields.iteritems():
@@ -122,8 +130,10 @@ class ExtensibleModelForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super(ExtensibleModelForm, self).save(commit=False)
-        print self.cleaned_data.keys()
+        if not instance.data:
+            instance.data = {}
         for key in self.cleaned_data.keys():
+            print key
             if key[:5] == 'data.':
                 instance.data[key[5:]] = self.cleaned_data[key]
         if commit:
