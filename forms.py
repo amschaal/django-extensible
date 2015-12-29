@@ -136,7 +136,7 @@ class ExtensibleModelForm(forms.ModelForm):
             print key
             if key[:5] == 'data.':
                 instance.data[key[5:]] = self.cleaned_data[key]
-        if commit:
+        if commit and instance:
             instance.save()
         return instance
 
