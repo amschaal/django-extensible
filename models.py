@@ -4,6 +4,7 @@ from django.db.models import Q
 from jsonfield import JSONField
 import copy
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields import HStoreField
 
 def generate_pk():
     return str(uuid4())[:15]
@@ -26,7 +27,7 @@ class ModelType(models.Model):
 class ExtensibleModel(models.Model):
     type = models.ForeignKey(ModelType, null=True, blank=True)
     #@deprecated: will use json, eventually will use native jsonb field with Django 1.9
-    data = JSONField(null=True,blank=True,default={})
+    data = HStoreField(null=True,blank=True,default=dict)#JSONField(null=True,blank=True,default=dict)
     def fields(self):
         return self._meta.get_all_field_names()
     def data_fields(self):
