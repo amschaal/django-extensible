@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 
-from extensible.drf.filters import HstoreFilter, HstoreOrderFilter
+from extensible.drf.filters import HstoreFilter, HstoreOrderFilter,\
+    MultiFieldFilter
 from extensible.models import ModelType
 
 
@@ -8,7 +9,7 @@ class ExtensibleViewset(viewsets.ModelViewSet):
     hstore_field = 'data'
     def __init__(self,*args,**kwargs):
         super(ExtensibleViewset, self).__init__(*args,**kwargs)
-        self.filter_backends += (HstoreFilter,HstoreOrderFilter)
+        self.filter_backends += (HstoreFilter,HstoreOrderFilter,MultiFieldFilter)
 #     def get_queryset(self):
 #         print 'GET queryset'
 #         qs = super(ExtensibleViewset, self).get_queryset()
