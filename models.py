@@ -25,7 +25,7 @@ class ModelType(models.Model):
 
 
 class ExtensibleModel(models.Model):
-    type = models.ForeignKey(ModelType, null=True, blank=True)
+    type = models.ForeignKey(ModelType, null=True, blank=True, on_delete=models.PROTECT)
     #@deprecated: will use json, eventually will use native jsonb field with Django 1.9
     data = HStoreField(null=True,blank=True,default=dict)#JSONField(null=True,blank=True,default=dict)
     def fields(self):
