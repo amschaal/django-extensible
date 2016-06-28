@@ -13,7 +13,10 @@ class ModelTypeSerializer(serializers.ModelSerializer):
     fields = JSONField()
     class Meta:
         model = ModelType
-#         field=('name','description','fields','content_type__model')
+class FlatModelTypeSerializer(serializers.ModelSerializer):
+    fields = JSONField()
+    class Meta:
+        model = ModelType
 
 class DataSerializer(serializers.Serializer):
     def __init__(self, *args, **kwargs):
@@ -32,8 +35,7 @@ class DataSerializer(serializers.Serializer):
                 field.source = None
 
 class ExtensibleSerializer(serializers.ModelSerializer):
-    type = ModelRelatedField(model=ModelType,serializer=ModelTypeSerializer,required=False,allow_null=True)
-    type__name = serializers.StringRelatedField(source='type.name',read_only=True)
+    type = ModelRelatedField(model=ModelType,serializer=FlatModelTypeSerializer,required=False,allow_null=True)
     data = DictField(default={},required=False)
     def __init__(self, *args, **kwargs):
         self.model_type_fields = {} #Cache model type fields used by DataSerializer, keyed by instance.type_id
