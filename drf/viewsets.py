@@ -9,7 +9,7 @@ class ExtensibleViewset(viewsets.ModelViewSet):
     hstore_field = 'data'
     def __init__(self,*args,**kwargs):
         super(ExtensibleViewset, self).__init__(*args,**kwargs)
-        self.filter_backends += (HstoreFilter,HstoreOrderFilter,MultiFieldFilter)
+        self.filter_backends += (HstoreFilter,HstoreOrderFilter)
 #     def get_queryset(self):
 #         print 'GET queryset'
 #         qs = super(ExtensibleViewset, self).get_queryset()
