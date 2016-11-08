@@ -22,10 +22,8 @@ class ModelType(models.Model):
         from django.core.urlresolvers import reverse
         return reverse('model_type', kwargs={'pk':self.id})
 
-
-
 class ExtensibleModel(models.Model):
-    type = models.ForeignKey(ModelType, null=True, blank=True)
+    type = models.ForeignKey(ModelType, null=True, blank=True, on_delete=models.PROTECT)
     #@deprecated: will use json, eventually will use native jsonb field with Django 1.9
     data = HStoreField(null=True,blank=True,default=dict)#JSONField(null=True,blank=True,default=dict)
     def fields(self):
