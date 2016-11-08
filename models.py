@@ -12,7 +12,7 @@ def generate_pk():
 class ModelType(models.Model):
 #     content_type = models.CharField(max_length=100)
     content_type = models.ForeignKey(ContentType)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100,db_index=True)
     description = models.TextField()
 #     plugins = models.ManyToManyField(Plugin,null=True,blank=True, through='ModelTypePlugins')
     fields = JSONField(null=True,blank=True)
