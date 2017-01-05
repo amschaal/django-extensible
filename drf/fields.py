@@ -26,7 +26,7 @@ class DRFFieldHandler():
         return options
 
     def create_field_for_text(self, field, options):
-        options['allow_blank'] = bool(field.get("allow_blank", 1) )
+        options['allow_blank'] = not bool(field.get("required", 0) )
         options['max_length'] = int(field.get("max_length", "500") )
         return CharField(**options)
     
@@ -34,7 +34,7 @@ class DRFFieldHandler():
 #         return forms.FileField(**options)
     
     def create_field_for_textarea(self, field, options):
-        options['allow_blank'] = bool(field.get("allow_blank", 1) )
+        options['allow_blank'] = not bool(field.get("required", 0) )
         options['max_length'] = int(field.get("max_length", "9999") )
         return CharField(**options)
 

@@ -2,6 +2,8 @@ from django import forms
 from crispy_forms.helper import FormHelper
 from models import ModelType
 import json
+from django.contrib.contenttypes.models import ContentType
+from extensible.models import ExtensibleModel
 
 
 
@@ -146,6 +148,11 @@ class ModelTypeForm(forms.ModelForm):
         fields = ('content_type','name','description','fields')
 
 class CreateModelTypeForm(forms.ModelForm):
+    def __init__(self,*args,**kwargs):
+        super(CreateModelTypeForm, self).__init__(*args,**kwargs)
+        cts = ContentType.objects.all()
+        queryset = ContentType.objects.filter(id__in=[ct.id for ct in cts if ct.model_class() and issubclass(ct.model_class(), ExtensibleModel)])
+        self.fields['content_type'].queryset=queryset
     class Meta:
         model = ModelType
         fields = ('content_type','name','description')
