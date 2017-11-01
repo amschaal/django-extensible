@@ -8,17 +8,6 @@ from rest_framework.settings import api_settings
 class ExtensibleViewset(viewsets.ModelViewSet):
     hstore_field = 'data'
     filter_backends = api_settings.DEFAULT_FILTER_BACKENDS + [HstoreFilter,HstoreOrderFilter,MultiFieldFilter]
-#     def get_queryset(self):
-#         print 'GET queryset'
-#         qs = super(ExtensibleViewset, self).get_queryset()
-#         filters = {}
-#         for key,value in self.request.query_params.items():
-#             if key.starts_with('data__'):
-#                 filters[key]=value
-#         print 'FILTERS!!!!'
-#         print filters
-#         return qs.filter(**filters)
-#     filter_backends = (HstoreFilter,)
     def get_serializer(self, *args, **kwargs):
         """
         Return the serializer instance that should be used for validating and

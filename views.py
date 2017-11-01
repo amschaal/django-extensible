@@ -26,7 +26,7 @@ def test(request):
         else:
             json_form = JSONForm(fields=fields)
     
-    return render(request, 'json_form/test.html', {'json_form':json_form,'fields':fields,'message':message},context_instance=RequestContext(request))
+    return render(request, 'json_form/test.html', {'json_form':json_form,'fields':fields,'message':message})
 
 def update_model_type(request,pk):
     json_form = ModelType.objects.get(pk=pk)
@@ -48,7 +48,7 @@ def create_modeltype(request):
         if form.is_valid():
             model_type = form.save()
             return redirect(model_type.get_absolute_url()) 
-    return render(request, 'extensible/create.html', {'form':form} ,context_instance=RequestContext(request))
+    return render(request, 'extensible/create.html', {'form':form} )
 
 # class ModelTypeCreate(CreateView):
 #     form_class = CreateModelTypeForm

@@ -24,7 +24,7 @@ class HstoreOrderFilter(filters.OrderingFilter):
     """
     Filter that only allows users to see their own objects.
     """
-    def get_valid_fields(self, queryset, view):
+    def get_valid_fields(self, queryset, view,context={}):
         hstore_field = getattr(view, 'hstore_field', None)
         if not hstore_field:
             return super(HstoreOrderFilter, self).get_valid_fields(queryset,view)
@@ -49,7 +49,7 @@ class HstoreOrderFilter(filters.OrderingFilter):
         params = request.query_params.get(self.ordering_param)
         if params:
             fields = [param.strip() for param in params.split(',')]
-            ordering_strings = self.remove_invalid_fields(queryset, fields, view)
+            ordering_strings = self.remove_invalid_fields(queryset, fields, view,request)#,request
 
         # No ordering was included, or all the ordering fields were invalid
         table = queryset.model._meta.db_table
