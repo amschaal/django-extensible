@@ -3,7 +3,7 @@ from rest_framework import serializers
 from rest_framework.fields import DictField
 
 from extensible.drf.fields import ModelRelatedField, DRFFieldHandler, JSONField
-from extensible.models import ModelType
+from extensible.models import ModelType, ModelSubType
 from rest_framework.utils import model_meta
 
 
@@ -15,6 +15,12 @@ class ModelTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ModelType
         fields = '__all__'
+
+class ModelSubTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ModelSubType
+        fields = '__all__'
+
 class FlatModelTypeSerializer(serializers.ModelSerializer):
     fields = JSONField()
     class Meta:
@@ -39,6 +45,7 @@ class DataSerializer(serializers.Serializer):
 
 class ExtensibleSerializer(serializers.ModelSerializer):
     type = ModelRelatedField(model=ModelType,serializer=FlatModelTypeSerializer,required=False,allow_null=True)
+    subtype = ModelRelatedField(model=ModelSubType,serializer=ModelSubTypeSerializer,required=False,allow_null=True)
     data = DataSerializer() #placeholder, overwritten in __init__
     def __init__(self, *args, **kwargs):
         self.model_type_fields = {} #Cache model type fields used by DataSerializer, keyed by instance.type_id
